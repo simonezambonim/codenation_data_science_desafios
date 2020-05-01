@@ -1,0 +1,71 @@
+import pandas as pd
+import numpy as np
+
+black_friday = pd.read_csv("black_friday.csv")
+
+black_friday.head()
+
+black_friday.describe().T
+
+black_friday.info()
+
+df_info = pd.DataFrame({'nome':black_friday.columns,'types':black_friday.dtypes,'na': black_friday.isna().sum(),'na%':(black_friday.isna().sum()/len(black_friday))*100})
+df_info
+
+black_friday.shape
+
+black_friday.groupby(['Gender','Age']).agg({'User_ID':'nunique'})
+
+def q1():
+    # Retorne aqui o resultado da questão 1.
+    return black_friday.shape
+
+def q2():
+    # Retorne aqui o resultado da questão 2.
+    return black_friday[(black_friday['Age']=='26-35') & (black_friday['Gender']=='F')]['User_ID'].nunique()
+
+def q3():
+    # Retorne aqui o resultado da questão 3.
+    return black_friday['User_ID'].nunique()
+
+def q4():
+    # Retorne aqui o resultado da questão 4.
+    return black_friday.dtypes.nunique()
+
+def q5():
+    # Retorne aqui o resultado da questão 5.
+    aux = black_friday.isna().sum(axis=1)
+    aux1 = [1 if (x!=0) else 0 for x in aux]
+    # sum(aux!=0)/len(black_friday) 
+    return sum(aux1)/len(black_friday)
+
+def q6():
+    # Retorne aqui o resultado da questão 6.
+    na_max = black_friday.isna().sum().max()
+    return int(na_max)
+
+def q7():
+    # Retorne aqui o resultado da questão 7.
+    #black_friday['Product_Category_3'].value_counts().index[0]
+    return black_friday['Product_Category_3'].mode()[0]
+
+def q8():
+    # Retorne aqui o resultado da questão 8.
+    p_min = black_friday['Purchase'].min()
+    p_max = black_friday['Purchase'].max()
+    p_norm = (black_friday['Purchase']-p_min)/(p_max-p_min)
+    return float(p_norm.mean())
+
+def q9():
+    # Retorne aqui o resultado da questão 9.
+    p_mean = black_friday['Purchase'].mean()
+    p_std = black_friday['Purchase'].std()
+    z =( black_friday['Purchase']-p_mean)/p_std
+    z_interval = aux.between(-1,1, inclusive = True).sum()
+    return int(z_interval)
+
+def q10():
+    # Retorne aqui o resultado da questão 10.
+    aux1 = black_friday[black_friday['Product_Category_2'].isna()]['Product_Category_2']
+    aux2 = black_friday[black_friday['Product_Category_2'].isna()]['Product_Category_3']
+    return aux1.equals(aux2)
