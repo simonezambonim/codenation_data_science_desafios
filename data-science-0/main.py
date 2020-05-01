@@ -18,7 +18,7 @@ import pandas as pd
 import numpy as np
 
 
-# In[2]:
+# In[3]:
 
 
 black_friday = pd.read_csv("black_friday.csv")
@@ -92,7 +92,8 @@ def q2():
      input [pd.DataFrame]
      output [int] 
     '''
-    return black_friday[(black_friday['Age']=='26-35') & (black_friday['Gender']=='F')]['User_ID'].nunique()
+    #black_friday[(black_friday['Age']=='26-35') & (black_friday['Gender']=='F')]['User_ID'].nunique()
+    return len(black_friday[(black_friday['Age']=='26-35') & (black_friday['Gender']=='F')])
 
 
 # ## Questão 3
