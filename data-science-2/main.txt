@@ -1,0 +1,221 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.stats as sct
+import statsmodels.api as sm
+import seaborn as sns
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
+#%matplotlib inline
+
+from IPython.core.pylabtools import figsize
+figsize(12, 8)
+
+sns.set()
+
+athletes = pd.read_csv("athletes.csv")
+
+def get_sample(df, col_name, n=100, seed=42):
+    """Get a sample from a column of a dataframe.
+    
+    It drops any numpy.nan entries before sampling. The sampling
+    is performed without replacement.
+    
+    Example of numpydoc for those who haven't seen yet.
+    
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Source dataframe.
+    col_name : str
+        Name of the column to be sampled.
+    n : int
+        Sample size. Default is 100.
+    seed : int
+        Random seed. Default is 42.
+    
+    Returns
+    -------
+    pandas.Series
+        Sample of size n from dataframe's column.
+    """
+    np.random.seed(seed)
+    
+    random_idx = np.random.choice(df[col_name].dropna().index, size=n, replace=False)
+    
+    return df.loc[random_idx, col_name]
+
+df = athletes.copy()
+
+# Sua análise começa aqui.
+df.info()
+
+pd.DataFrame({'cols':df.columns,
+             'nunique':df.nunique(),
+             'nan':df.isnull().sum(),
+             'nan%':(df.isnull().sum()*100)/len(df)})
+
+# The person who won more gold medals
+df[df.gold == df.gold.max()]
+
+# The person who won more medals
+df['total'] = df[['gold','silver','bronze']].sum( axis=1)
+df[df['total']==df['total'].max()]
+
+sns.pairplot(df)
+
+sns.heatmap(df.corr())
+
+def q1():
+    '''
+    Normality test scipy.stats.shapiro(x)
+    Null hypothesis states: data was drawn from a normal distribution.
+    if p_val<significance level, we reject the null hypothesis
+    if p_val>significance level, we can't Reject the null, it means normal_dist_eval = True
+    '''
+    alpha = 0.05
+    sample = get_sample(df, 'height', 3000).ravel() #get sample
+    p_val = sct.shapiro(sample)[1] #test
+    normal_dist_eval = p_val>alpha
+    
+    return normal_dist_eval   
+
+q1() # p_val<0.05, we reject the Null Hypothesis (the data does not follow normal distribution)
+
+sample = get_sample(df, 'height', 3000).ravel()
+fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, figsize=(18,8))
+sm.qqplot(sample, fit=True, line ='45', ax = ax1) 
+sns.distplot(sample, fit=sct.norm, bins=25, kde=True, ax=ax2)
+sns.boxplot(y = sample, ax=ax3)
+plt.show()
+
+def q2():  
+    '''
+    Normality test scipy.stats.jarque_bera(x)
+    Null hypothesis states: data was drawn from a normal distribution.
+    if p_val<significance level, we reject the null hypothesis
+    if p_val>significance level, we can't Reject the null, it means normal_dist_eval = True
+    '''    
+    alpha = 0.05
+    sample = get_sample(df, 'height', 3000).ravel()
+    p_val = sct.jarque_bera(sample)[1]
+    normal_dist_eval = p_val>alpha
+    
+    return normal_dist_eval
+
+q2()
+
+def q3():
+    '''
+    Normality test scipy.stats.normaltest(a, axis=0, nan_policy='propagate')
+    Null hypothesis states: data was drawn from a normal distribution.
+    if p_val<significance level, we reject the null hypothesis
+    if p_val>significance level, we can't reject the null, it means normal_dist_eval = True
+    '''    
+    alpha = 0.05
+    sample = get_sample(df, 'weight', 3000).ravel()
+    p_val = sct.normaltest(sample)[1]
+    normal_dist_eval = p_val>alpha
+
+    return normal_dist_eval
+
+q3()
+
+sample_w = get_sample(df, 'weight', 3000).ravel()
+fig, (ax1, ax2,ax3) = plt.subplots(nrows=1, ncols=3, figsize=(18,8))
+sm.qqplot(sample_w, fit=True, line ='45', ax = ax1) 
+sns.distplot(sample_w, fit=sct.norm, bins=25, kde=True, ax=ax2 )
+sns.boxplot(y = sample_w, ax=ax3)
+plt.show()
+
+def q4():
+    '''
+    Normality test scipy.stats.normaltest(a, axis=0, nan_policy='propagate')
+    Null hypothesis states: data was drawn from a normal distribution.
+    if p_val<significance level, we reject the null hypothesis
+    if p_val>significance level, we can't reject the null, it means normal_dist_eval = True
+    '''    
+    alpha = 0.05
+    sample = np.log(get_sample(df, 'weight', 3000).ravel())
+    p_val = sct.normaltest(sample)[1]
+    normal_dist_eval = p_val>alpha
+    
+    return normal_dist_eval
+
+q4()
+
+sample_w_log = np.log(get_sample(df, 'weight', 3000).ravel())
+fig, (ax1, ax2,ax3) = plt.subplots(nrows=1, ncols=3, figsize=(18,8))
+sm.qqplot(sample_w_log, fit=True, line ='45', ax = ax1) 
+sns.distplot(sample_w_log, fit=sct.norm, bins=25, kde=True, ax=ax2 )
+sns.boxplot(y = sample_w_log, ax=ax3)
+plt.show()
+
+df.head()
+
+bra = df.loc[df.nationality == "BRA", 'height'].dropna()
+usa = df.loc[df.nationality == "USA", 'height'].dropna()
+can = df.loc[df.nationality == "CAN", 'height'].dropna()
+print("Variance BRA {:f} USA {:f} CAN {:f}".format(bra.var(), usa.var(), can.var()))
+print("Mean     BRA {:f} USA {:f} CAN {:f}".format(bra.mean(), usa.mean(), can.mean()))
+
+fig, (ax1, ax2,ax3) = plt.subplots(nrows=1, ncols=3, figsize=(18,8))
+sns.distplot(bra, fit=sct.norm, bins=25, kde=True, ax=ax1)
+sns.distplot(usa, fit=sct.norm, bins=25, kde=True, ax=ax2)
+sns.distplot(can, fit=sct.norm, bins=25, kde=True, ax=ax3)
+plt.show()
+
+def q5():
+    '''
+    Run scipy.stats.ttest_ind(a,b, equal_var)
+    Evaluate if there are statistically significant differences 
+    between the mean of the sample means from 2 independent groups 
+    and different variance 
+    Status quo: There is no statistical significant difference (equal averages)
+    '''
+    alpha=0.05
+    bra = df.loc[df.nationality == "BRA", 'height'].dropna()
+    usa = df.loc[df.nationality == "USA", 'height'].dropna()
+
+    p_val = sct.ttest_ind(bra,usa,equal_var=False)[1]
+    stats_equal = p_val>alpha
+    return stats_equal
+
+q5()
+
+def q6():
+    '''
+    Run scipy.stats.ttest_ind(a,b, equal_var)
+    Evaluate if there are statistically significant differences 
+    between the mean of the sample means from 2 independent groups 
+    and different variance 
+    Status quo: There is no statistical significant difference (equal averages)
+    '''
+    alpha=0.05
+    bra = df.loc[df.nationality == "BRA", 'height'].dropna()
+    usa = df.loc[df.nationality == "USA", 'height'].dropna()
+    can = df.loc[df.nationality == "CAN", 'height'].dropna()
+    p_val = sct.ttest_ind(bra,can,equal_var=False)[1]
+    stats_equal = p_val>alpha
+    return stats_equal
+
+q6()
+
+def q7():
+    '''
+    Run scipy.stats.ttest_ind(a,b, equal_var)
+    Evaluate if there are statistically significant differences 
+    between the mean of the sample means from 2 independent groups 
+    and different variance 
+    Status quo: There is no statistical significant difference (equal averages)
+    '''
+    alpha=0.05
+    usa = df.loc[df.nationality == "USA", 'height'].dropna()
+    can = df.loc[df.nationality == "CAN", 'height'].dropna()
+    p_val = sct.ttest_ind(usa,can,equal_var=False)[1].item()
+    return round(p_val,8)
+
+q7()
+
+
