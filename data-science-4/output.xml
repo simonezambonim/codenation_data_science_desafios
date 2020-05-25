@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite errors="0" failures="0" hostname="LAPTOP-QDRLIADU" name="pytest" skipped="0" tests="7" time="3.959" timestamp="2020-05-24T23:40:56.380172"><testcase classname="test_submit" file="test_submit.py" line="3" name="test_q1" time="0.000"></testcase><testcase classname="test_submit" file="test_submit.py" line="11" name="test_q2" time="0.003"></testcase><testcase classname="test_submit" file="test_submit.py" line="16" name="test_q3" time="0.010"></testcase><testcase classname="test_submit" file="test_submit.py" line="21" name="test_q4" time="0.020"></testcase><testcase classname="test_submit" file="test_submit.py" line="26" name="test_q5" time="0.002"><system-out>Lower Bound: -3.8149999999999995, Upper Bound:3.885
+Outliers/Observations: 22.321, Outliers: 50, Below threshold: 24, Above threshold: 26
+</system-out></testcase><testcase classname="test_submit" file="test_submit.py" line="34" name="test_q6" time="0.397"><system-out>Shape (1773, 27335)
+Number of times the word phone appeared: 213
+Number of documents the word phone appeared: 143
+</system-out></testcase><testcase classname="test_submit" file="test_submit.py" line="39" name="test_q7" time="0.415"><system-out>TF-IDF 8.88774594667355
+</system-out></testcase></testsuite></testsuites>
